@@ -59,8 +59,8 @@ public class Login extends HttpServlet {
 			ResultSet rs = stmt.executeQuery("select * from instructors");
 			while(rs.next()){
 				if(rs.getString("username").equals(user) && rs.getString("password").equals(pw)){
-					request.getSession().setAttribute("user", rs.getString("instructor_lastname"));
-					instructorID = rs.getInt("instructor_id");
+					request.getSession().setAttribute("user", rs.getString("last_name"));
+					instructorID = rs.getInt("id");
 					pass=true;
 				}
 			}

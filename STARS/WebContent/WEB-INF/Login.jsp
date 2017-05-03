@@ -14,7 +14,7 @@
 
 	<img src="../images/starslogo.png" alt="STARS">
 		<div class="login-form">
-			<div class="login-error">${loginError}</div>
+			<p id="error">${loginError}</p>
 			<form action="Login" method="post">
 				<input class="form-control" type="text" name="username" placeholder="Username">
 				<input class="form-control" type="password" name="password" placeholder="Password">
@@ -24,11 +24,9 @@
 			
 			<hr>
 			
-			<form action="Login" method="post">
-				<input type="hidden" name="guest" value="yes">
-				<button type="submit" class="btn btn-primary btn-lg btn-block">Sign Up</button>
-			</form>
+			<a href="SignUp"><button type="submit" class="btn btn-primary btn-lg btn-block">Sign Up</button></a>
 		</div>
 	</div>
+	
 </body>
 </html>

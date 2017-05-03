@@ -4,7 +4,9 @@ package Attendance;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
@@ -36,111 +38,166 @@ public class Swipe extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if(request.getSession().getAttribute("user")!=null){
-			String idParam = request.getParameter("ID")==null?"yes":request.getParameter("ID");
-			Boolean ID = true;
-			if(idParam.equals("yes")){
-				ID = true;
-			}else{
-				ID=false;
-			}
-			request.getSession().setAttribute("ID", ID);
-			request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
-		}else{
-			response.sendRedirect("Login");
-		}
+
+		request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if(request.getSession().getAttribute("user")!= null){
-		
-			//Verifies data read from card reader
-		String swipe = request.getParameter("swipe")==null?"":request.getParameter("swipe");
-		
-		if(request.getSession().getAttribute("settingError")==null){
-			if(swipe != "" && swipe != null){
-				
-				//Get current time;
-		        SimpleDateFormat hour = new SimpleDateFormat("HH");
-		        SimpleDateFormat minute = new SimpleDateFormat("mm");
-		        Date d = new Date();
+		String action = request.getParameter("action").toString();
 
-		        int currentHour = Integer.parseInt(hour.format(d));
-		        int currentMinute = Integer.parseInt(minute.format(d));
-		        
+		switch (action){
+		case "readSwipe":
+			String swipeData = request.getParameter("swipeData");
+			readSwipe(request,response,swipeData);
+			break;
+		case "update":
+			update(request,response);
+			break;
+		case "login":
+			String username = request.getParameter("username");
+			String pw = request.getParameter("pw");
+			login(request,response,username,pw);
+			break;
+		case "select":
+			String courseSelected = request.getParameter("courseSelected");
+			select(request,response,courseSelected);
+			break;
+		}
+		
+		request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
+	}
 	
-				String lastName = "";
-				String firstName = "";
-				String cin = "";
-				boolean pass = false;
-				try{
-					lastName = swipe.substring(swipe.indexOf('^')+1, swipe.indexOf('/'));
-					firstName = swipe.substring(swipe.indexOf('/')+1, swipe.indexOf('^', swipe.indexOf('/')+1));
-					cin = swipe.substring(swipe.length()-10, swipe.length()-1);
-					request.getSession().setAttribute("swipeError", null);
-				}catch(Exception e){
-					request.getSession().setAttribute("swipeError", "Invalid Swipe. Please Re-Swipe Your Card.");
-					request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
+	private void readSwipe(HttpServletRequest request, HttpServletResponse response,String swipeData)throws ServletException, IOException{
+		String lastName = null;
+		String firstName = null;
+		int cin = 0;
+		String course = request.getSession().getAttribute("currentCourse").toString();
+		int id = (int) request.getSession().getAttribute("currentID");
+		try{
+			lastName = swipeData.substring(swipeData.indexOf('^')+1, swipeData.indexOf('/'));
+			firstName = swipeData.substring(swipeData.indexOf('/')+1, swipeData.indexOf('^', swipeData.indexOf('/')+1));
+			String cinString = swipeData.substring(swipeData.length()-10, swipeData.length()-1);
+			cin=Integer.parseInt(cinString);
+			request.getSession().setAttribute("swipeError", null);
+		}catch(Exception e){
+			request.getSession().setAttribute("swipeError", "Invalid Swipe. Please Re-Swipe Your Card.");
+		}
+		
+		Connection c = null;
+		
+		try{
+			String url = "jdbc:mysql://localhost/stars";
+			String username = "";
+			String password = "";
+			
+			c = DriverManager.getConnection(url,username,password);
+			Statement stmt = c.createStatement();
+			
+			String query = "SELECT * FROM "+course+"_"+id+"";
+			ResultSet rs = stmt.executeQuery(query);
+			ResultSetMetaData rsmd = rs.getMetaData();
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("M_d_yyyy");
+			Date d = new Date();
+			String date = sdf.format(d);
+			boolean pass = false;
+			int columnCount = rsmd.getColumnCount();
+			
+			for(int i = 1; i<=columnCount; i++){
+				if(date.equals(rsmd.getColumnName(i))){
+					pass=true;
 				}
-				
-				//Verifies if student exists n database
-				Connection c = null;
-				
-				try{
-					String url = "jdbc:mysql://localhost/stars";
-					String username = "";
-					String password = "";
-					
-					c = DriverManager.getConnection(url,username,password);
-					Statement stmt = c.createStatement();
-					
-					String query = "select * from student where cin = "+cin;
-					ResultSet rs = stmt.executeQuery(query);
-					
-					while(rs.next()){
-						if(rs.getString("cin")==cin){
-							pass=true;
-						}
-					}
-					
-				}catch(SQLException e){
-					throw new ServletException(e);
-				}finally{
-					try{
-						if(c != null) c.close();
-					}catch(SQLException e){
-						throw new ServletException(e);
-					}
-				}
-				
-				StudentModel student = new StudentModel(firstName,lastName,cin);
-				request.setAttribute("swipe", student);
-				
-				Time courseDeadline = (Time) request.getSession().getAttribute("courseDeadline");
-				int lateHour = Integer.parseInt(hour.format(courseDeadline));
-				int lateMinute = Integer.parseInt(minute.format(courseDeadline));
-
-				if(currentHour<lateHour){
-					request.getSession().setAttribute("status", "On Time!");
-				}else if(currentHour == lateHour){
-					if(currentMinute <= lateMinute){
-						request.getSession().setAttribute("status", "On Time!");
-					}else{
-						request.getSession().setAttribute("status", "Late!");
-					}
-				}else{
-					request.getSession().setAttribute("status", "Late!");
-				}
-
-				
+			}
+			
+			if(pass){
+	            String sql = "INSERT INTO "+course+"_"+id+"(cin,firstName,lastName,"+date+") VALUES(?,?,?,?)";
+	            PreparedStatement pstmt = c.prepareStatement( sql );
+	            pstmt.setInt(1, cin);
+	            pstmt.setString(2, firstName);
+	            pstmt.setString(3, lastName);
+	            pstmt.setString(4, "O");
+	
+	            pstmt.executeUpdate();
 			}else{
-				request.setAttribute("swipe", null);
+				String sql = "ALTER TABLE "+course+"_"+id+" ADD "+date+" VARCHAR(60)";
+				PreparedStatement pstmt = c.prepareStatement( sql );
+	
+	            pstmt.executeUpdate();
+	            
+	            sql = "INSERT INTO "+course+"_"+id+"(cin,firstName,lastName,"+date+") VALUES(?,?,?,?)";
+	            pstmt = c.prepareStatement( sql );
+	            pstmt.setInt(1, cin);
+	            pstmt.setString(2, firstName);
+	            pstmt.setString(3, lastName);
+	            pstmt.setString(4, "O");
+	
+	            pstmt.executeUpdate();
+			}
+			
+		}catch(SQLException e){
+			throw new ServletException(e);
+		}finally{
+			try{
+				if(c != null) c.close();
+			}catch(SQLException e){
+				throw new ServletException(e);
 			}
 		}
-		request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
-		}else{
-			response.sendRedirect("Login");
-		}
+	}
 
+	private void update(HttpServletRequest request, HttpServletResponse response){
+		
+	}
+	
+	private void login(HttpServletRequest request, HttpServletResponse response,String username, String pw)throws ServletException, IOException{
+		ArrayList<CourseModel> courses = new ArrayList<>();
+		boolean pass = false;
+		int id = -1;
+		
+		Connection c = null;
+		try{
+			String url = "jdbc:mysql://localhost/stars";
+            
+			c = DriverManager.getConnection(url,"","");
+			Statement stmt = c.createStatement();
+			
+			//Queries all instructors that are in DB
+			ResultSet rs = stmt.executeQuery("select * from instructors");
+			while(rs.next()){
+				if(rs.getString("username").equals(username) && rs.getString("password").equals(pw)){
+					request.getSession().setAttribute("instructorName", rs.getString("last_name"));
+					id = rs.getInt("id");
+					pass = true;
+				}
+			}
+			
+			if(pass){
+				//Queries for all courses that the user has under his ID
+				rs = stmt.executeQuery("select * from class where instructor_id = '"+id+"'");
+				while(rs.next()){
+					courses.add(new CourseModel(rs.getString("course_name"),null, rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
+				}
+				request.getSession().setAttribute("courseSelectView", true);
+				request.getSession().setAttribute("loginView", false);
+				request.getSession().setAttribute("courses", courses);
+				request.getSession().setAttribute("currentID", id);
+			}
+		 }catch( SQLException e ){
+			 throw new ServletException( e );
+	     }
+	     finally{
+            try{
+                if( c != null ) c.close();
+            }
+            catch( SQLException e ){
+                throw new ServletException( e );
+            }
+	     }
+	}
+	
+	private void select(HttpServletRequest request, HttpServletResponse response,String course){
+		request.getSession().setAttribute("currentCourse", course);
+		request.getSession().setAttribute("swipeView", true);
+		request.getSession().setAttribute("courseSelectView", false);
 	}
 }

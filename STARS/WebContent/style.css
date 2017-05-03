@@ -2,22 +2,42 @@ html{
 	height:100%;
 }
 body{
-	padding-top:5%;
-	padding-bottom:10%;
+	padding-top:4%;
 	background:linear-gradient(to top right, #e6eeff,#99bbff);
 	background-repeat:no-repeat;
 }
 .login-form, .course-select, .course-options, .add-course{
 	border:1px solid gray;
 	border-radius:5px;
-	max-width: 330px;
+	max-width: 350px;
   	padding: 15px;
   	margin: 0 auto;
   	box-shadow:5px 5px 5px #888888;
   	background-color:#FFFFFF;
 }
-
-.login-form .form-control{
+.signup-form{
+	border:1px solid gray;
+	border-radius:5px;
+	padding: 15px;
+	max-width:600px;
+	margin:0 auto;
+	box-shadow:5px 5px 5px #888888;
+  	background-color:#FFFFFF;
+}
+.name{
+  width:49.5%;
+  border:1px solid grey;
+  border-radius:3px;
+  padding:5px;
+}
+.username, .pw{
+  width:100%;
+  border:1px solid grey;
+  border-radius:3px;
+  padding:5px;
+  margin-bottom:5px;
+}
+.login-form .form-control, .signup-form .form-control{
 	position: relative;
   	height: auto;
 	padding: 10px;
@@ -30,7 +50,7 @@ body{
 hr{
 	border:1px solid gray;
 }
-.login-error,#deadline{
+#error,#deadline{
 	font-size:16px;
 	color:red;
 }
@@ -39,7 +59,10 @@ hr{
 	width:75%;
 }
 .deadline-setting{
-	margin-left:40px;
+	max-height:450px;
+	overflow:auto;
+	margin-left:20px;
+	margin-right:20px;
 }
 .deadline-setting .form-control,
 .add-course .form-control{
@@ -65,6 +88,31 @@ hr{
 	font-weight:bold;
 	background-color:white;
 	color:black;
+}
+
+/* The animation code */
+@keyframes example {
+    0%{
+    display: none;
+    transform: : rotateX(90deg);
+	}
+	50%{
+	    opacity: 0.5;
+	    transform: : rotateX(0deg);
+	}
+	100%{
+	    display: none;
+	    opacity: 0;
+	    transform: rotateX(90deg);
+	}
+}
+.animation{
+/* The element to apply the animation to */
+    width: 100px;
+    height: 100px;
+    background-color: green;
+    animation-name: example;
+    animation-duration: 2s;
 }
 /* Style the tab */
 div.tab {

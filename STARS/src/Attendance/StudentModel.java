@@ -1,22 +1,22 @@
 package Attendance;
 
 public class StudentModel {
-	String cin;
+	int cin;
 	String firstName;
 	String lastName;
 	
-	public StudentModel(String firstName, String lastName, String cin) {
+	public StudentModel(String firstName, String lastName, int cin) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.cin = cin;
 	}
 
-	public String getCin() {
+	public int getCin() {
 		return cin;
 	}
 
-	public void setCin(String cin) {
+	public void setCin(int cin) {
 		this.cin = cin;
 	}
 

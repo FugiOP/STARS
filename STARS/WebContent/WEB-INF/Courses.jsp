@@ -24,7 +24,7 @@
 						</c:forEach>
 					</select>
 					<hr>
-					<button type="submit" class="btn btn-success btn-block">Proceed</button>
+					<button type="submit" class="btn btn-success btn-block">Go Online</button>
 				</form>
 				
 			</div>
@@ -33,24 +33,37 @@
 			
 			<div class="add-course">
 			
-			<label id="course-label">Add Course</label>
-				<form>
-					<input class="form-control" style="width:100%; margin-bottom:10px;" placeholder="Course Name">
+				<label id="course-label">Add Course</label>
+				<c:if test="${not empty (addError || duplicateError)}">
+					<p id="error">${addError}</p>
+					<p id="error">${duplicateError}</p>
+				</c:if>
+				<form action="AddCourse" method="post">
+					<input class="form-control" name="courseName" style="width:100%; margin-bottom:10px;" placeholder="Course Name">
 					<br/>
 					<input class="form-control" type="number" name="hour" placeholder="00" min="0" max="11">
-					<input class="form-control" type="number" name="minute" placeholder="00" min="0" max="59">
-					<input type="radio" class="radio-inline" value="AM">AM
-					<input type="radio" class="radio-inline" value="PM">PM
+					<input class="form-control" type="number" name="min" placeholder="00" min="0" max="59">
+					<input type="radio" name="ampm" class="radio-inline" value="AM">AM
+					<input type="radio" name="ampm" class="radio-inline" value="PM">PM
 					<hr>
 					<button type="submit" class="btn btn-primary btn-block">Add</button>
+				</form>
+			</div>
+			
+			<div class="col-xs-6">
+				EXPORT Selected ATTENDANCE to CSV FILE
+				<br>
+				ADD VIEW BTN to VIEW ATTENDANCE IN REAL TIME
+				<form action="Courses" method="post">
+					<input type="hidden" name="action" value="logout">
+					<button type="submit">Logout</button>
 				</form>
 			</div>
 		</div>
 		
 		<div class="col-xs-6">
 			<div class="course-options">
-			<label id="course-label">Course Settings</label>
-				<form action="Settings" method="post">	
+			<label id="course-label">Course Settings</label>	
 					<hr>
 					<label>On-time Deadline</label>
 					<div class="deadline-setting">
@@ -59,24 +72,36 @@
 							<br/>
 							<c:choose>
 								<c:when test="${course.hour<12}">
-									<input class="form-control" type="number" name="hour" placeholder="${course.hour}" min="0" max="11">
-									<input class="form-control" type="number" name="minute" placeholder="${course.min}" min="0" max="59">
-									<input type="radio" class="radio-inline" value="AM" checked>AM
-									<input type="radio" class="radio-inline" value="PM">PM
+									<form action="Settings" method="post">
+										<input type="hidden" name="courseName" value="${course.courseName}">
+										<input class="form-control" type="number" name="hour" placeholder="${course.hour}" min="0" max="11">
+										<input class="form-control" type="number" name="min" placeholder="${course.min}" min="0" max="59">
+										<input type="radio" class="radio-inline" value="AM" checked>AM
+										<input type="radio" class="radio-inline" value="PM">PM
+										<input type="hidden" name="action" value="1">
+										<button type="submit" class="btn btn-success btn-block">Apply Changes</button>
+									</form>
 								</c:when>
 								<c:otherwise>
-									<input class="form-control" type="number" name="hour" placeholder="${course.hour-12}" min="0" max="11">
-									<input class="form-control" type="number" name="minute" placeholder="${course.min}" min="0" max="59">
-									<input type="radio" class="radio-inline" value="AM">AM
-									<input type="radio" class="radio-inline" value="PM" checked>PM
+									<form action="Settings" method="post">
+										<input type="hidden" name="courseName" value="${course.courseName}">
+										<input class="form-control" type="number" name="hour" placeholder="${course.hour-12}" min="0" max="11">
+										<input class="form-control" type="number" name="min" placeholder="${course.min}" min="0" max="59">
+										<input type="radio" class="radio-inline" value="AM">AM
+										<input type="radio" class="radio-inline" value="PM" checked>PM
+										<input type="hidden" name="action" value="1">
+										<button type="submit" class="btn btn-success btn-block">Apply Changes</button>
+									</form>
 								</c:otherwise>
 							</c:choose>
+							<form action="Settings" method ="post">
+								<input type="hidden" name="courseName" value="${course.courseName}">
+								<input type="hidden" name="action" value="2">
+								<button type="submit" class="btn btn-danger btn-block">Remove</button>
+							</form>
 							<hr>
 						</c:forEach>
-						<button type="submit" class="btn btn-success btn-block">Apply Changes</button>
 					</div>
-				</form>
-				
 			</div>
 		</div>
 	</div>
