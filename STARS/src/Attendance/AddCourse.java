@@ -114,7 +114,7 @@ public class AddCourse extends HttpServlet {
 		}
 		
 		if(pass){
-			courses.add(new CourseModel(courseName,deadline,hour,min));
+			courses.add(new CourseModel(courseName,hour,min));
 			request.getSession().setAttribute("courses", courses);
 		}
 		response.sendRedirect("Courses");

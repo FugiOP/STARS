@@ -68,7 +68,7 @@ public class Login extends HttpServlet {
 			//Queries for all courses that the user has under his ID
 			rs = stmt.executeQuery("select * from class where instructor_id = '"+instructorID+"'");
 			while(rs.next()){
-				courses.add(new CourseModel(rs.getString("course_name"),null, rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
+				courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
 			}
 			
 		 }catch( SQLException e ){

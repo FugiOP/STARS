@@ -73,9 +73,7 @@ public class Swipe extends HttpServlet {
 		int cin = 0;
 		String selectedCourse = request.getSession().getAttribute("selectedCourse").toString();
 		int id = (int) request.getSession().getAttribute("currentID");
-		String status = "";
-		
-		
+		String status = getStatus(request,response);
 		
 		try{
 			lastName = swipeData.substring(swipeData.indexOf('^')+1, swipeData.indexOf('/'));
@@ -105,8 +103,8 @@ public class Swipe extends HttpServlet {
 			Date d = new Date();
 			String date = sdf.format(d);
 			boolean pass = false;
-			int columnCount = rsmd.getColumnCount();
 			
+			int columnCount = rsmd.getColumnCount();
 			for(int i = 1; i<=columnCount; i++){
 				if(date.equals(rsmd.getColumnName(i))){
 					pass=true;
@@ -114,18 +112,34 @@ public class Swipe extends HttpServlet {
 			}
 			
 			if(pass){
-	            String sql = "INSERT INTO "+selectedCourse+"_"+id+"(cin,firstName,lastName,"+date+") VALUES(?,?,?,?)";
-	            PreparedStatement pstmt = c.prepareStatement( sql );
-	            pstmt.setInt(1, cin);
-	            pstmt.setString(2, firstName);
-	            pstmt.setString(3, lastName);
-	            pstmt.setString(4, "O");
-	
-	            pstmt.executeUpdate();
+				query = "SELECT cin FROM "+selectedCourse+"_"+id+"";
+	            rs = stmt.executeQuery(query);
+	            
+	            boolean exists = false;
+	            
+	            while(rs.next()){
+	            	if(rs.getInt("cin")==cin){
+	            		exists = true;
+	            	}
+	            }
+	            
+	            if(!exists){
+		            String sql = "INSERT INTO "+selectedCourse+"_"+id+"(cin,firstname,lastname,"+date+") VALUES(?,?,?,?)";
+		            PreparedStatement pstmt = c.prepareStatement( sql );
+		            pstmt.setInt(1, cin);
+		            pstmt.setString(2, firstName);
+		            pstmt.setString(3, lastName);
+		            pstmt.setString(4, status);
+		
+		            pstmt.executeUpdate();
+	            }else{
+	            	String sql = "UPDATE "+selectedCourse+"_"+id+" SET "+date+"='"+status+"' WHERE cin='"+cin+"'";
+		            PreparedStatement pstmt = c.prepareStatement( sql );
+	            	pstmt.executeUpdate();
+	            }
 			}else{
 				String sql = "ALTER TABLE "+selectedCourse+"_"+id+" ADD "+date+" VARCHAR(60)";
 				PreparedStatement pstmt = c.prepareStatement( sql );
-	
 	            pstmt.executeUpdate();
 	            
 	            boolean exists = false;
@@ -140,16 +154,16 @@ public class Swipe extends HttpServlet {
 	            }
 	            
 	            if(!exists){
-	            sql = "INSERT INTO "+selectedCourse+"_"+id+"(cin,firstName,lastName,"+date+") VALUES(?,?,?,?)";
-	            pstmt = c.prepareStatement( sql );
-	            pstmt.setInt(1, cin);
-	            pstmt.setString(2, firstName);
-	            pstmt.setString(3, lastName);
-	            pstmt.setString(4, status);
-	
-	            pstmt.executeUpdate();
+	            	sql = "INSERT INTO "+selectedCourse+"_"+id+"(cin,firstname,lastname,"+date+") VALUES(?,?,?,?)";
+		            pstmt = c.prepareStatement( sql );
+		            pstmt.setInt(1, cin);
+		            pstmt.setString(2, firstName);
+		            pstmt.setString(3, lastName);
+		            pstmt.setString(4, status);
+		
+		            pstmt.executeUpdate();
 	            }else{
-	            	sql = "UPDATE "+selectedCourse+"_"+id+" SET "+date+"="+status+" where cin="+cin+"";
+	            	sql = "UPDATE "+selectedCourse+"_"+id+" SET "+date+"='"+status+"' WHERE cin='"+cin+"'";
 	            	pstmt = c.prepareStatement( sql );
 	            	pstmt.executeUpdate();
 	            }
@@ -196,7 +210,7 @@ public class Swipe extends HttpServlet {
 				//Queries for all courses that the user has under his ID
 				rs = stmt.executeQuery("select * from class where instructor_id = '"+id+"'");
 				while(rs.next()){
-					courses.add(new CourseModel(rs.getString("course_name"),null, rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
+					courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
 				}
 				request.getSession().setAttribute("courseSelectView", true);
 				request.getSession().setAttribute("loginView", false);
@@ -239,5 +253,33 @@ public class Swipe extends HttpServlet {
 		request.getSession().setAttribute("selectedCourse", selectedCourse);
 		request.getSession().setAttribute("swipeView", true);
 		request.getSession().setAttribute("courseSelectView", false);
+	}
+	private String getStatus(HttpServletRequest request, HttpServletResponse response){
+		String status = null;
+		
+		SimpleDateFormat hour = new SimpleDateFormat("HH");
+	    SimpleDateFormat minute = new SimpleDateFormat("mm");
+	    Date d = new Date();
+	    
+	    int currentHour = Integer.parseInt(hour.format(d));
+	    int currentMinute = Integer.parseInt(minute.format(d));
+		
+	    Time courseDeadline = (Time) request.getSession().getAttribute("courseDeadline");
+		int lateHour = Integer.parseInt(hour.format(courseDeadline));
+		int lateMinute = Integer.parseInt(minute.format(courseDeadline));
+
+		if(currentHour<lateHour){
+			status = "O";
+		}else if(currentHour == lateHour){
+			if(currentMinute <= lateMinute){
+				status = "O";
+			}else{
+				status = "L";
+			}
+		}else{
+			status = "L";
+		}
+		
+		return status;
 	}
 }

@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 <link href="../style.css" rel="stylesheet">
-<title>Select Course</title>
+<title>Course Options and Settings</title>
 </head>
 <body>
 	<div class="row">
@@ -24,8 +24,9 @@
 						</c:forEach>
 					</select>
 					<hr>
-					<input type="hidden" name="action" value="viewAttendance">
-					<button type="submit" class="btn btn-success btn-block">View</button>
+					
+					<button type="submit" name="action" value="viewAttendance" class="btn btn-primary btn-block">View</button>
+					<button type="submit" name="action" value="export" class="btn btn-success btn-block">Export And Download</button>
 				</form>
 				
 			</div>
@@ -53,10 +54,8 @@
 			</div>
 			
 			<div class="col-xs-6">
-				EXPORT Selected ATTENDANCE to CSV FILE
 				<form action="Courses" method="post">
-					<input type="hidden" name="action" value="logout">
-					<button type="submit">Logout</button>
+					<button type="submit" name="action" value="logout">Logout</button>
 				</form>
 			</div>
 		</div>
@@ -78,8 +77,7 @@
 										<input class="form-control" type="number" name="min" placeholder="${course.min}" min="0" max="59">
 										<input type="radio" class="radio-inline" value="AM" checked>AM
 										<input type="radio" class="radio-inline" value="PM">PM
-										<input type="hidden" name="action" value="1">
-										<button type="submit" class="btn btn-success btn-block">Apply Changes</button>
+										<button type="submit" name="action" value="1" class="btn btn-success btn-block">Apply Changes</button>
 									</form>
 								</c:when>
 								<c:otherwise>
@@ -89,15 +87,13 @@
 										<input class="form-control" type="number" name="min" placeholder="${course.min}" min="0" max="59">
 										<input type="radio" class="radio-inline" value="AM">AM
 										<input type="radio" class="radio-inline" value="PM" checked>PM
-										<input type="hidden" name="action" value="1">
-										<button type="submit" class="btn btn-success btn-block">Apply Changes</button>
+										<button type="submit" name="action" value="1" class="btn btn-success btn-block">Apply Changes</button>
 									</form>
 								</c:otherwise>
 							</c:choose>
 							<form action="Settings" method ="post">
 								<input type="hidden" name="courseName" value="${course.courseName}">
-								<input type="hidden" name="action" value="2">
-								<button type="submit" class="btn btn-danger btn-block">Remove</button>
+								<button type="submit" name="action" value="2" class="btn btn-danger btn-block">Remove</button>
 							</form>
 							<hr>
 						</c:forEach>

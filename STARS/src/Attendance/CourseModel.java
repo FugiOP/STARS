@@ -5,14 +5,12 @@ import java.sql.Time;
 public class CourseModel {
 
 	String courseName;
-	Time deadline;
 	int hour;
 	int min;
 	
-	public CourseModel(String courseName, Time deadline, int hour, int min) {
+	public CourseModel(String courseName, int hour, int min) {
 		super();
 		this.courseName = courseName;
-		this.deadline = deadline;
 		this.hour = hour;
 		this.min = min;
 	}
@@ -23,14 +21,6 @@ public class CourseModel {
 
 	public void setCourseName(String courseName) {
 		this.courseName = courseName;
-	}
-
-	public Time getDeadline() {
-		return deadline;
-	}
-
-	public void setDeadline(Time deadline) {
-		this.deadline = deadline;
 	}
 
 	public int getHour() {
