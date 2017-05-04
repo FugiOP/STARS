@@ -16,7 +16,7 @@
 		
 			<div class="course-select">
 			
-				<label id="course-label">Select Your Course</label>
+				<label id="course-label">View Course Attendance</label>
 				<form action="Courses" method="post">
 					<select class="form-control" name="courseName">
 						<c:forEach items="${courses}" var="course">
@@ -24,7 +24,8 @@
 						</c:forEach>
 					</select>
 					<hr>
-					<button type="submit" class="btn btn-success btn-block">Go Online</button>
+					<input type="hidden" name="action" value="viewAttendance">
+					<button type="submit" class="btn btn-success btn-block">View</button>
 				</form>
 				
 			</div>
@@ -37,6 +38,7 @@
 				<c:if test="${not empty (addError || duplicateError)}">
 					<p id="error">${addError}</p>
 					<p id="error">${duplicateError}</p>
+					<p id="error">${invalidName}</p>
 				</c:if>
 				<form action="AddCourse" method="post">
 					<input class="form-control" name="courseName" style="width:100%; margin-bottom:10px;" placeholder="Course Name">
@@ -52,8 +54,6 @@
 			
 			<div class="col-xs-6">
 				EXPORT Selected ATTENDANCE to CSV FILE
-				<br>
-				ADD VIEW BTN to VIEW ATTENDANCE IN REAL TIME
 				<form action="Courses" method="post">
 					<input type="hidden" name="action" value="logout">
 					<button type="submit">Logout</button>
@@ -105,6 +105,5 @@
 			</div>
 		</div>
 	</div>
-
 </body>
 </html>

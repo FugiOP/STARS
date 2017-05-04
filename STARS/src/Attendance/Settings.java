@@ -75,6 +75,10 @@ public class Settings extends HttpServlet {
 	            pstmt.setInt(2, instructorID);
 	
 	            pstmt.executeUpdate();
+	            
+	            sql = "DROP TABLE "+courseName+"_"+instructorID+"";
+	            pstmt = c.prepareStatement( sql );
+	            pstmt.executeUpdate();
 
 			 }catch( SQLException e ){
 				 throw new ServletException( e );

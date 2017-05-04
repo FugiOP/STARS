@@ -46,11 +46,13 @@ public class AddCourse extends HttpServlet {
 		int hour = -1;
 		int min = -1;
 		int instructorID = -1;
+		Time deadline = null;
 		boolean pass = true;
 		
+		request.getSession().setAttribute("invalidName", null);
 		request.getSession().setAttribute("duplicateError", null);
 		request.getSession().setAttribute("addError", null);
-		
+				
 		try{
 			hour = Integer.parseInt(request.getParameter("hour"));
 			min = Integer.parseInt(request.getParameter("min"));
@@ -80,28 +82,26 @@ public class AddCourse extends HttpServlet {
 					}
 				}
 				
-				if(pass){
-		            String sql = "INSERT INTO class (course_name,instructor_id,deadline) VALUES(?,?,?)";
+				if(pass){ 
+		            String name = courseName+"_"+instructorID;
+		            String sql = "CREATE TABLE "+name+"(cin int,firstname VARCHAR(32),lastname VARCHAR(32))";
+		            PreparedStatement pstmt = c.prepareStatement(sql);
+		            pstmt.executeUpdate();
 		            
-		            Time deadline = new Time(hour,min,00);
+		            sql = "INSERT INTO class (course_name,instructor_id,deadline) VALUES(?,?,?)";
+		            deadline = new Time(hour,min,00);
+		            pstmt = c.prepareStatement( sql );
 		            
-		            PreparedStatement pstmt = c.prepareStatement( sql );
 		            pstmt.setString(1, courseName);
 		            pstmt.setInt(2,instructorID);
 		            pstmt.setTime(3, deadline);
-	
 		            pstmt.executeUpdate();
 		            
-		            sql = "CREATE TABLE "+courseName+"_"+instructorID+"(cin int,firstname VARCHAR(32),lastname VARCHAR(32))";
-		            pstmt = c.prepareStatement(sql);
-		            pstmt.executeUpdate();
-		            
-		            courses.add(new CourseModel(courseName,deadline,hour,min));
-		            request.getSession().setAttribute("courses", courses);
 				}
 				
 			 }catch( SQLException e ){
-				 throw new ServletException( e );
+				request.getSession().setAttribute("invalidName", "Course name must contain chacaters A-Z, a-z, 0-9 or ' _ '");
+				pass=false;
 		     }
 		     finally{
 	            try{
@@ -111,6 +111,11 @@ public class AddCourse extends HttpServlet {
 	                throw new ServletException( e );
 	            }
 		     }
+		}
+		
+		if(pass){
+			courses.add(new CourseModel(courseName,deadline,hour,min));
+			request.getSession().setAttribute("courses", courses);
 		}
 		response.sendRedirect("Courses");
 	}

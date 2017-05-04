@@ -21,7 +21,7 @@
 	<c:choose>
 		<c:when test="${swipeView == true}">
 			<div class="swipe-container">
-				<h1>${name} <small>${currentCourse}</small></h1>
+				<h1>${instructorName}<small>${selectedCourse}</small></h1>
 				<h4 id="deadline">Deadline for this course is: ${courseDeadline} ${ampm}</h4>
 				<form action="Swipe" method = "post">
 					<input type="hidden" name="action" value="update">
