@@ -42,35 +42,38 @@ public class Courses extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ArrayList<CourseModel> courses = new ArrayList<>();
-		Connection c = null;
-		int instructorID = (int) request.getSession().getAttribute("instructorID");
 		
-		try{
-			String url = "jdbc:mysql://localhost/stars";
-			String username = "";
-			String password = "";
-            
-			c = DriverManager.getConnection(url,username,password);
-			Statement stmt = c.createStatement();
-			
-			//Queries for all courses that the user has under his ID
-			ResultSet rs = stmt.executeQuery("select * from class where instructor_id = '"+instructorID+"'");
-			while(rs.next()){
-				courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
-			}
-			
-		 }catch( SQLException e ){
-			 throw new ServletException( e );
-	     }
-	     finally{
-            try{
-                if( c != null ) c.close();
-            }
-            catch( SQLException e ){
-                throw new ServletException( e );
-            }
-	     }
-		request.getSession().setAttribute("courses", courses);
+		int instructorID = request.getSession().getAttribute("instructorID")==null?-1:(int) request.getSession().getAttribute("instructorID");
+
+		if(instructorID != -1){
+			Connection c = null;
+			try{
+				String url = "jdbc:mysql://localhost/stars";
+				String username = "";
+				String password = "";
+	            
+				c = DriverManager.getConnection(url,username,password);
+				Statement stmt = c.createStatement();
+				
+				//Queries for all courses that the user has under his ID
+				ResultSet rs = stmt.executeQuery("select * from class where instructor_id = '"+instructorID+"'");
+				while(rs.next()){
+					courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
+				}
+				
+			 }catch( SQLException e ){
+				 throw new ServletException( e );
+		     }
+		     finally{
+	            try{
+	                if( c != null ) c.close();
+	            }
+	            catch( SQLException e ){
+	                throw new ServletException( e );
+	            }
+		     }
+			request.getSession().setAttribute("courses", courses);
+		}
 		request.getRequestDispatcher( "/WEB-INF/Courses.jsp" ).forward(request, response );
 	}
 
@@ -80,6 +83,7 @@ public class Courses extends HttpServlet {
 		
 		int instructorID = (int) request.getSession().getAttribute("instructorID");
 		String action = request.getParameter("action");
+		
 		if(action.equals("logout")){
 			logout(request,response,instructorID);
 			response.sendRedirect("Login");
@@ -183,7 +187,6 @@ public class Courses extends HttpServlet {
 	            // set to binary type if MIME mapping not found
 	            mimeType = "application/octet-stream";
 	        }
-	        System.out.println("MIME type: " + mimeType);
 	         
 	        // modifies response
 	        response.setContentType(mimeType);
@@ -207,7 +210,7 @@ public class Courses extends HttpServlet {
 	        inStream.close();
 	        outStream.close();    
 		}catch(IOException e){
-			System.out.println("File not found");
+
 		}
 	}
 }

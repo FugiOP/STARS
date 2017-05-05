@@ -23,139 +23,49 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/**
- * Servlet implementation class TEST
- */
 @WebServlet("/Attendance/TEST")
 public class TEST extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public void init( ServletConfig config ) throws ServletException{
-        super.init( config );
-
-        try
-        {
-            Class.forName( "com.mysql.jdbc.Driver" );
-        }
-        catch( ClassNotFoundException e )
-        {
-            throw new ServletException( e );
-        }
-    }
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher( "/WEB-INF/TEST.jsp" ).forward(request, response );
+		if(request.getSession().getAttribute("user")!=null){
+			if(request.getSession().getAttribute("courseIsSelected") != null){
+				request.getRequestDispatcher( "/WEB-INF/SwipeView.jsp" ).forward(request, response );
+			}else{
+				request.getRequestDispatcher( "/WEB-INF/CourseView.jsp" ).forward(request, response );
+				response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+		        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+		        response.setDateHeader("Expires", 0);
+			}
+		}else{
+			request.getRequestDispatcher( "/WEB-INF/LoginView.jsp" ).forward(request, response );
+			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+	        response.setDateHeader("Expires", 0);
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Connection c = null;
+		String action = request.getParameter("action");
 		
-		String filePath = "filename.csv";
-		try{
-			String url = "jdbc:mysql://localhost/stars";
-			String username = "";
-			String password = "";
-            
-			c = DriverManager.getConnection(url,username,password);
-			Statement stmt = c.createStatement();
+		if(action.equals("login")){
+			String username = request.getParameter("username");
+			String pw = request.getParameter("pw");
 			
-			//Queries all instructors that are in DB
-			ResultSet rs = stmt.executeQuery("select * from class");
-			ResultSetMetaData rsmd = rs.getMetaData();
-			
-			//-----------------------------------------------------//
-			BufferedWriter bw = null;
-			FileWriter fw = null;
-			try {
-
-				fw = new FileWriter(filePath);
-				bw = new BufferedWriter(fw);
-				for(int i = 1;i<=rsmd.getColumnCount(); i++){
-					bw.write(rsmd.getColumnName(i));
-					bw.write(" , ");
-				}
-				bw.newLine();
-				
-				while(rs.next()){
-					for(int i = 1;i<=rsmd.getColumnCount(); i++){
-						bw.write(rs.getObject(i).toString());
-						bw.write(" , ");
-					}
-					bw.newLine();
-				}
-
-				System.out.println("Done");
-				
-			} catch (IOException e) {
-
-				e.printStackTrace();
-
-			} finally {
-
-				try {
-
-					if (bw != null)
-						bw.close();
-
-					if (fw != null)
-						fw.close();
-
-				} catch (IOException ex) {
-
-					ex.printStackTrace();
-
-				}
-
+			if(username.equals("fugi") && pw.equals("123")){
+				request.getSession().setAttribute("user", "YUP");
 			}
-			//----------------------------------------------//
-			
-		 }catch( SQLException e ){
-			 throw new ServletException( e );
-	     }
-	     finally{
-            try{
-                if( c != null ) c.close();
-            }
-            catch( SQLException e ){
-                throw new ServletException( e );
-            }
-	     }
-		File downloadFile = new File(filePath);
-		FileInputStream inStream = new FileInputStream(downloadFile);
-         
-        // obtains ServletContext
-        ServletContext context = getServletContext();
-         
-        // gets MIME type of the file
-        String mimeType = context.getMimeType(filePath);
-        if (mimeType == null) {        
-            // set to binary type if MIME mapping not found
-            mimeType = "application/octet-stream";
-        }
-        System.out.println("MIME type: " + mimeType);
-         
-        // modifies response
-        response.setContentType(mimeType);
-        response.setContentLength((int) downloadFile.length());
-         
-        // forces download
-        String headerKey = "Content-Disposition";
-        String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
-        response.setHeader(headerKey, headerValue);
-         
-        // obtains response's output stream
-        OutputStream outStream = response.getOutputStream();
-         
-        byte[] buffer = new byte[4096];
-        int bytesRead = -1;
-         
-        while ((bytesRead = inStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, bytesRead);
-        }
-         
-        inStream.close();
-        outStream.close();      
+		}
 		
+		if(action.equals("courseSelection")){
+			request.getSession().setAttribute("courseIsSelected", "YEP");
+		}
+
+		if(action.equals("logout")){
+			request.getSession().invalidate();
+		}
 		
+		response.sendRedirect("TEST");
 	}
 
 }

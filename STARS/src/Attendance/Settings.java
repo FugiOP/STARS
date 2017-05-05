@@ -36,7 +36,13 @@ public class Settings extends HttpServlet {
 		case 1:
 			int hour = Integer.parseInt(request.getParameter("hour"));
 			int min = Integer.parseInt(request.getParameter("min"));
+			String ampm = request.getParameter("ampm");
+			
 			Time deadline = new Time(hour,min,00);
+			
+			if(ampm.equals("PM")){
+				deadline = new Time(hour+12,min,00);
+			}
 			
 			try{
 				String url = "jdbc:mysql://localhost/stars";

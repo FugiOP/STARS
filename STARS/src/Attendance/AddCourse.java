@@ -42,11 +42,11 @@ public class AddCourse extends HttpServlet {
 		
 		ArrayList<CourseModel> courses = (ArrayList<CourseModel>) request.getSession().getAttribute("courses");
 
-		String courseName = request.getParameter("courseName");	
+		String courseName = request.getParameter("courseName");
+		String ampm = "AM";
 		int hour = -1;
 		int min = -1;
 		int instructorID = -1;
-		Time deadline = null;
 		boolean pass = true;
 		
 		request.getSession().setAttribute("invalidName", null);
@@ -56,6 +56,10 @@ public class AddCourse extends HttpServlet {
 		try{
 			hour = Integer.parseInt(request.getParameter("hour"));
 			min = Integer.parseInt(request.getParameter("min"));
+			ampm = request.getParameter("ampm");
+			if(ampm.equals("PM")){
+				hour+=12;
+			}
 			instructorID = (int) request.getSession().getAttribute("instructorID");
 		}catch(Exception e){
 			request.getSession().setAttribute("addError", "You must input a Course Name and Deadline Time");
@@ -89,7 +93,7 @@ public class AddCourse extends HttpServlet {
 		            pstmt.executeUpdate();
 		            
 		            sql = "INSERT INTO class (course_name,instructor_id,deadline) VALUES(?,?,?)";
-		            deadline = new Time(hour,min,00);
+		            Time deadline = new Time(hour,min,00);
 		            pstmt = c.prepareStatement( sql );
 		            
 		            pstmt.setString(1, courseName);

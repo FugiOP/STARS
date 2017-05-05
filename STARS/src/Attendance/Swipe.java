@@ -38,8 +38,21 @@ public class Swipe extends HttpServlet {
 	}
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
+		if(request.getSession().getAttribute("instructorName")!=null){
+			if(request.getSession().getAttribute("selectedCourse") != null){
+				request.getRequestDispatcher( "/WEB-INF/SwipeView.jsp" ).forward(request, response );
+			}else{
+				request.getRequestDispatcher( "/WEB-INF/CourseView.jsp" ).forward(request, response );
+				response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+		        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+		        response.setDateHeader("Expires", 0);
+			}
+		}else{
+			request.getRequestDispatcher( "/WEB-INF/LoginView.jsp" ).forward(request, response );
+			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+	        response.setDateHeader("Expires", 0);
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -62,9 +75,13 @@ public class Swipe extends HttpServlet {
 			String courseSelected = request.getParameter("courseSelected");
 			select(request,response,courseSelected);
 			break;
+			
+		case "logout":
+			request.getSession().invalidate();
+			break;
 		}
 		
-		request.getRequestDispatcher( "/WEB-INF/Swipe.jsp" ).forward(request, response );
+		response.sendRedirect("Swipe");
 	}
 	
 	private void readSwipe(HttpServletRequest request, HttpServletResponse response,String swipeData)throws ServletException, IOException{
@@ -74,6 +91,7 @@ public class Swipe extends HttpServlet {
 		String selectedCourse = request.getSession().getAttribute("selectedCourse").toString();
 		int id = (int) request.getSession().getAttribute("currentID");
 		String status = getStatus(request,response);
+		boolean validSwipe = true;
 		
 		try{
 			lastName = swipeData.substring(swipeData.indexOf('^')+1, swipeData.indexOf('/'));
@@ -82,9 +100,12 @@ public class Swipe extends HttpServlet {
 			cin=Integer.parseInt(cinString);
 			request.getSession().setAttribute("swipeError", null);
 		}catch(Exception e){
+			validSwipe=false;
+			request.getSession().setAttribute("animation", "fail");
 			request.getSession().setAttribute("swipeError", "Invalid Swipe. Please Re-Swipe Your Card.");
 		}
 		
+		if(validSwipe){
 		Connection c = null;
 		
 		try{
@@ -103,7 +124,6 @@ public class Swipe extends HttpServlet {
 			Date d = new Date();
 			String date = sdf.format(d);
 			boolean pass = false;
-			
 			int columnCount = rsmd.getColumnCount();
 			for(int i = 1; i<=columnCount; i++){
 				if(date.equals(rsmd.getColumnName(i))){
@@ -168,9 +188,9 @@ public class Swipe extends HttpServlet {
 	            	pstmt.executeUpdate();
 	            }
 			}
-			
+			request.getSession().setAttribute("animation", "pass");
 		}catch(SQLException e){
-			throw new ServletException(e);
+			request.getSession().setAttribute("animation", "fail");
 		}finally{
 			try{
 				if(c != null) c.close();
@@ -178,10 +198,53 @@ public class Swipe extends HttpServlet {
 				throw new ServletException(e);
 			}
 		}
+		}else{
+			request.getSession().setAttribute("animation", "fail");
+		}
 	}
 
-	private void update(HttpServletRequest request, HttpServletResponse response){
+	private void update(HttpServletRequest request, HttpServletResponse response) throws ServletException{
+		ArrayList<CourseModel> courses = new ArrayList<>();
 		
+		Connection c = null;
+		try{
+			int id = (int) request.getSession().getAttribute("currentID");
+			String courseName = (String) request.getSession().getAttribute("selectedCourse");
+			
+			String url = "jdbc:mysql://localhost/stars";
+            
+			c = DriverManager.getConnection(url,"","");
+			Statement stmt = c.createStatement();
+
+			//Queries for all courses that the user has under his ID
+			ResultSet rs = stmt.executeQuery("select deadline from class where instructor_id = '"+id+"' AND course_name = '"+courseName+"'");
+			while(rs.next()){
+				Time courseDeadline;
+				String ampm;
+				
+				if(rs.getTime("deadline").getHours()>12){
+					courseDeadline = new Time(rs.getTime("deadline").getHours()-12,rs.getTime("deadline").getMinutes(),00);
+					ampm="PM";
+					request.getSession().setAttribute("lateTime", new Time(rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes(),00));
+				}else{
+					courseDeadline = new Time(rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes(),00);
+					ampm="AM";
+					request.getSession().setAttribute("lateTime", new Time(rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes(),00));
+				}
+				request.getSession().setAttribute("ampm", ampm);
+				request.getSession().setAttribute("courseDeadline", courseDeadline);
+			}
+		}catch( SQLException e ){
+				 throw new ServletException( e );
+		}
+		finally{
+		   try{
+		       if( c != null ) c.close();
+		   }
+		   catch( SQLException e ){
+			   throw new ServletException( e );
+		   }
+		}
 	}
 	
 	private void login(HttpServletRequest request, HttpServletResponse response,String username, String pw)throws ServletException, IOException{
@@ -212,8 +275,6 @@ public class Swipe extends HttpServlet {
 				while(rs.next()){
 					courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
 				}
-				request.getSession().setAttribute("courseSelectView", true);
-				request.getSession().setAttribute("loginView", false);
 				request.getSession().setAttribute("courses", courses);
 				request.getSession().setAttribute("currentID", id);
 			}
@@ -251,8 +312,6 @@ public class Swipe extends HttpServlet {
 			}
 		}
 		request.getSession().setAttribute("selectedCourse", selectedCourse);
-		request.getSession().setAttribute("swipeView", true);
-		request.getSession().setAttribute("courseSelectView", false);
 	}
 	private String getStatus(HttpServletRequest request, HttpServletResponse response){
 		String status = null;
@@ -264,9 +323,9 @@ public class Swipe extends HttpServlet {
 	    int currentHour = Integer.parseInt(hour.format(d));
 	    int currentMinute = Integer.parseInt(minute.format(d));
 		
-	    Time courseDeadline = (Time) request.getSession().getAttribute("courseDeadline");
-		int lateHour = Integer.parseInt(hour.format(courseDeadline));
-		int lateMinute = Integer.parseInt(minute.format(courseDeadline));
+	    Time lateTime = (Time) request.getSession().getAttribute("lateTime");
+		int lateHour = Integer.parseInt(hour.format(lateTime));
+		int lateMinute = Integer.parseInt(minute.format(lateTime));
 
 		if(currentHour<lateHour){
 			status = "O";
