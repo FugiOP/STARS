@@ -83,7 +83,7 @@
 										</select>
 										<br><br>
 										<div class="col-xs-6">
-											<button type="submit" name="action" value="1" class="btn btn-success">Apply Changes</button>
+											<button type="submit" name="action" value="change" class="btn btn-success">Apply Changes</button>
 										</div>
 									</form>
 								</c:when>
@@ -98,7 +98,7 @@
 										</select>
 										<br><br>
 										<div class="col-xs-6">
-											<button type="submit" name="action" value="1" class="btn btn-success">Apply Changes</button>
+											<button type="submit" name="action" value="change" class="btn btn-success">Apply Changes</button>
 										</div>
 									</form>
 								</c:otherwise>
@@ -106,7 +106,7 @@
 							<form action="Settings" method ="post">
 								<input type="hidden" name="courseName" value="${course.courseName}">
 								<div class="col-xs-1">
-									<button type="submit" name="action" value="2" class="btn btn-danger">Remove</button>
+									<button type="submit" name="action" value="remove" class="btn btn-danger">Remove</button>
 								</div>
 							</form>
 							<br>

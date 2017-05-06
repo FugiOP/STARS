@@ -8,7 +8,7 @@ body{
 .login-form, .course-select, .course-options, .add-course{
 	border:1px solid gray;
 	border-radius:5px;
-	max-width: 350px;
+	max-width: 400px;
   	padding: 15px;
   	margin: 0 auto;
   	box-shadow:5px 5px 5px #888888;
@@ -58,7 +58,7 @@ hr{
 	width:75%;
 }
 .deadline-setting{
-	max-height:450px;
+	max-height:400px;
 	overflow:auto;
 	margin-left:20px;
 	margin-right:20px;

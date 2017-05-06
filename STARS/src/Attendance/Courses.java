@@ -52,9 +52,9 @@ public class Courses extends HttpServlet {
 				if(instructorID != -1){
 					Connection c = null;
 					try{
-						String url = "jdbc:mysql://localhost/stars";
-						String username = "";
-						String password = "";
+						String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+						String username = "cs3220stu98";
+						String password = "!SagHy*C";
 			            
 						c = DriverManager.getConnection(url,username,password);
 						Statement stmt = c.createStatement();
@@ -107,8 +107,7 @@ public class Courses extends HttpServlet {
 			response.sendRedirect("Login");
 		}
 		if(action.equals("viewAttendance")){
-			request.getRequestDispatcher( "/WEB-INF/View.jsp" ).forward(request, response );
-
+			response.sendRedirect("View");
 		}
 		if(action.equals("export")){
 			export(request,response,currentCourse,instructorID);
@@ -123,10 +122,11 @@ public class Courses extends HttpServlet {
 		Connection c = null;
 		
 		String filePath = ""+course+"_Attendance.csv";
+		
 		try{
-			String url = "jdbc:mysql://localhost/stars";
-			String username = "";
-			String password = "";
+			String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+			String username = "cs3220stu98";
+			String password = "!SagHy*C";
             
 			c = DriverManager.getConnection(url,username,password);
 			Statement stmt = c.createStatement();
@@ -155,8 +155,6 @@ public class Courses extends HttpServlet {
 					}
 					bw.newLine();
 				}
-
-				System.out.println("Done");
 				
 			} catch (IOException e) {
 
@@ -214,6 +212,7 @@ public class Courses extends HttpServlet {
 	        // forces download
 	        String headerKey = "Content-Disposition";
 	        String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+	        System.out.print(downloadFile.getName());
 	        response.setHeader(headerKey, headerValue);
 	         
 	        // obtains response's output stream

@@ -107,9 +107,9 @@ public class Swipe extends HttpServlet {
 		Connection c = null;
 		
 		try{
-			String url = "jdbc:mysql://localhost/stars";
-			String username = "";
-			String password = "";
+			String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+			String username = "cs3220stu98";
+			String password = "!SagHy*C";
 			
 			c = DriverManager.getConnection(url,username,password);
 			Statement stmt = c.createStatement();
@@ -209,9 +209,8 @@ public class Swipe extends HttpServlet {
 			int id = (int) request.getSession().getAttribute("currentID");
 			String courseName = (String) request.getSession().getAttribute("selectedCourse");
 			
-			String url = "jdbc:mysql://localhost/stars";
-            
-			c = DriverManager.getConnection(url,"","");
+			String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+			c = DriverManager.getConnection(url,"cs3220stu98","!SagHy*C");
 			Statement stmt = c.createStatement();
 
 			//Queries for all courses that the user has under his ID
@@ -252,9 +251,9 @@ public class Swipe extends HttpServlet {
 		
 		Connection c = null;
 		try{
-			String url = "jdbc:mysql://localhost/stars";
-            
-			c = DriverManager.getConnection(url,"","");
+			String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+
+			c = DriverManager.getConnection(url,"cs3220stu98","!SagHy*C");
 			Statement stmt = c.createStatement();
 			
 			//Queries all instructors that are in DB

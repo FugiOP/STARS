@@ -69,9 +69,9 @@ public class AddCourse extends HttpServlet {
 			
 			Connection c = null;
 			try{
-				String url = "jdbc:mysql://localhost/stars";
-				String username = "";
-				String password = "";
+				String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+				String username = "cs3220stu98";
+				String password = "!SagHy*C";
 	            
 				c = DriverManager.getConnection( url, username, password );
 				Statement stmt = c.createStatement();

@@ -15,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.JOptionPane;
 
 @WebServlet("/Attendance/Settings")
 public class Settings extends HttpServlet {
@@ -29,11 +30,11 @@ public class Settings extends HttpServlet {
 		int instructorID = (int) request.getSession().getAttribute("instructorID");
 		String courseName = request.getParameter("courseName");
 
-		int action = Integer.parseInt(request.getParameter("action"));
+		String action = request.getParameter("action")==null?"":request.getParameter("action");
 		Connection c = null;
 		
 		switch(action){
-		case 1:
+		case "change":
 			int hour = Integer.parseInt(request.getParameter("hour"));
 			int min = Integer.parseInt(request.getParameter("min"));
 			String ampm = request.getParameter("ampm");
@@ -45,9 +46,9 @@ public class Settings extends HttpServlet {
 			}
 			
 			try{
-				String url = "jdbc:mysql://localhost/stars";
-				String username = "";
-				String password = "";
+				String url = "jdbc:mysql://cs3.calstatela.edu/cs3220stu98";
+				String username = "cs3220stu98";
+				String password = "!SagHy*C";
 	            
 	            String sql = "UPDATE class SET deadline=? WHERE instructor_id='"+instructorID+"' AND course_name='"+courseName+"'";
 	            c = DriverManager.getConnection( url, username, password );
@@ -67,40 +68,15 @@ public class Settings extends HttpServlet {
 	                throw new ServletException( e );
 	            }
 		     }
+			response.sendRedirect("Courses");
 			break;
-		case 2:
-			try{
-				String url = "jdbc:mysql://localhost/stars";
-				String username = "";
-				String password = "";
-	            
-				String sql = "DELETE from class WHERE course_name=? AND instructor_id=?";
-	            c = DriverManager.getConnection( url, username, password );
-	            
-	            PreparedStatement pstmt = c.prepareStatement( sql );
-	            pstmt.setString(1, courseName);
-	            pstmt.setInt(2, instructorID);
-	
-	            pstmt.executeUpdate();
-	            
-	            sql = "DROP TABLE "+courseName+"_"+instructorID+"";
-	            pstmt = c.prepareStatement( sql );
-	            pstmt.executeUpdate();
+		case "remove":
+			request.getSession().setAttribute("courseToRemove", courseName);
+			request.getSession().setAttribute("removeCourse", "yes");
+			request.getRequestDispatcher( "/WEB-INF/DeleteCourse.jsp" ).forward(request, response );
 
-			 }catch( SQLException e ){
-				 throw new ServletException( e );
-		     }
-		     finally{
-	            try{
-	                if( c != null ) c.close();
-	            }
-	            catch( SQLException e ){
-	                throw new ServletException( e );
-	            }
-		     }
 			break;
 		}
-		response.sendRedirect("Courses");
 	}
 
 }

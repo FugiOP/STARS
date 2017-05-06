@@ -16,8 +16,8 @@
 <div  class="container">
 
 <sql:setDataSource var="snapshot" driver="com.mysql.jdbc.Driver"
-     url="jdbc:mysql://localhost/stars"
-     user=""  password=""/>
+     url="jdbc:mysql://cs3.calstatela.edu/cs3220stu98"
+     user="cs3220stu98"  password="!SagHy*C"/>
 
 <sql:update dataSource="${snapshot}">
 CREATE TABLE temp LIKE ${currentCourse}_${instructorID};
