@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2017 at 11:37 PM
+-- Generation Time: May 06, 2017 at 07:09 AM
 -- Server version: 10.1.21-MariaDB
 -- PHP Version: 5.6.30
 
@@ -37,7 +37,39 @@ CREATE TABLE `class` (
 --
 
 INSERT INTO `class` (`course_name`, `instructor_id`, `deadline`) VALUES
-('PSY110', 17, '03:30:00');
+('CS3337', 17, '08:45:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cs3337_17`
+--
+
+CREATE TABLE `cs3337_17` (
+  `cin` int(11) DEFAULT NULL,
+  `firstname` varchar(32) DEFAULT NULL,
+  `lastname` varchar(32) NOT NULL DEFAULT 'A',
+  `5_5_2017` varchar(60) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `cs3337_17`
+--
+
+INSERT INTO `cs3337_17` (`cin`, `firstname`, `lastname`, `5_5_2017`) VALUES
+(222234555, 'ROGERIA', 'MAHIXO-DERTIGO', 'L'),
+(9879765, 'JIN', 'YOHHO-DER', 'L'),
+(232456777, 'SUKI', 'YOKOSKA-MUYHKI', 'L'),
+(789676453, 'YIKO', 'PARTER-MUYHKI', 'L'),
+(323456444, 'RIOPE', 'PARTER-MATRER', 'L'),
+(456666543, 'PADHMED', 'RAHMIREZ-HANNY', 'L'),
+(456776887, 'LUCIANA', 'BENNY-HILL', 'L'),
+(789777111, 'ROGER', 'TAHIREX-MANNYPO', 'L'),
+(222333456, 'DAISY', 'AWK-FRANKEN', 'L'),
+(333111213, 'RUHIKIE', 'AOYTAS-MIRTENOK', 'L'),
+(345012908, 'LUCY', 'AQZSER-IOKPO', 'L'),
+(323456754, 'REGIE', 'ARTER-MARTINOK', 'L'),
+(301209459, 'REFUGIO', 'ARROYO-MARTINEZ', 'L');
 
 -- --------------------------------------------------------
 
@@ -59,26 +91,6 @@ CREATE TABLE `instructors` (
 
 INSERT INTO `instructors` (`username`, `password`, `id`, `first_name`, `last_name`) VALUES
 ('fugi', 'haha123', 17, 'Refugio', 'Arroyo');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `psy110_17`
---
-
-CREATE TABLE `psy110_17` (
-  `cin` int(11) DEFAULT NULL,
-  `firstname` varchar(32) DEFAULT NULL,
-  `lastname` varchar(32) DEFAULT NULL,
-  `5_4_2017` varchar(60) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `psy110_17`
---
-
-INSERT INTO `psy110_17` (`cin`, `firstname`, `lastname`, `5_4_2017`) VALUES
-(301209459, 'REFUGIO', 'ARROYO-MARTINEZ', 'L');
 
 -- --------------------------------------------------------
 
