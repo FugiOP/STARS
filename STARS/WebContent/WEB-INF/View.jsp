@@ -2,7 +2,6 @@
 <%@ page import="javax.servlet.http.*,javax.servlet.*" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <html>
@@ -15,8 +14,6 @@
 </head>
 <body>
 <div  class="container">
-
-<a href="Courses"><button class="btn btn-success btn-lg">Back to Courses</button></a>
 
 <sql:setDataSource var="snapshot" driver="com.mysql.jdbc.Driver"
      url="jdbc:mysql://localhost/stars"
@@ -52,8 +49,9 @@ DROP TABLE temp;
 	</tr>
 	<c:forEach var="row" items="${result.rowsByIndex}">
 		<tr>
-			<td>${row[0]}</td>
-			<td>${row[1]}</td>
+			<c:forEach var="i" begin="0" end="${fn:length(row)-1}" step="1">
+				<td>${row[i]}</td>
+			</c:forEach>
 		</tr>
 	</c:forEach>
 </table>

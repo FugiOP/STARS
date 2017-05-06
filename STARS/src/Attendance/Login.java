@@ -33,7 +33,14 @@ public class Login extends HttpServlet {
     }
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		request.getRequestDispatcher( "/WEB-INF/Login.jsp" ).forward(request, response );
+		if(request.getSession().getAttribute("user") != null){
+			response.sendRedirect("Courses");
+			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+	        response.setDateHeader("Expires", 0);
+		}else{
+			request.getRequestDispatcher( "/WEB-INF/Login.jsp" ).forward(request, response );
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -86,7 +93,7 @@ public class Login extends HttpServlet {
 			request.getSession().setAttribute("loginError", null);
 			request.getSession().setAttribute("instructorID", instructorID);
 			request.getSession().setAttribute("courses", courses);
-			response.sendRedirect("Courses");		
+			response.sendRedirect("Courses");
 		}else{
 			request.getSession().setAttribute("loginError", "Invalid username/password!");
 			request.getRequestDispatcher( "/WEB-INF/Login.jsp" ).forward(request, response );

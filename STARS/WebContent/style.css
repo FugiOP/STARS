@@ -2,7 +2,6 @@ html{
 	height:100%;
 }
 body{
-	padding-top:4%;
 	background:linear-gradient(to top right, #e6eeff,#99bbff);
 	background-repeat:no-repeat;
 }
@@ -50,7 +49,7 @@ body{
 hr{
 	border:1px solid gray;
 }
-#error,#deadline{
+#error{
 	font-size:16px;
 	color:red;
 }
@@ -69,83 +68,33 @@ hr{
 	display:inline;
 	width:75px;
 }
-.swipe-container{
-	text-align:center;
-	border:1px solid gray;
-	border-radius:5px;
-	max-width: 70%;
-  	padding: 15px;
-  	margin: 0 auto;
-  	box-shadow:5px 5px 5px #888888;
-  	background-color:#FFFFFF;	
-}
-.clock{
-	margin:0 auto;
-	max-width:250px;
-	border:3px solid black;
-	border-radius:10px;
-	font-size:30px;
-	font-weight:bold;
-	background-color:white;
-	color:black;
-}
 
-/* The animation code */
-@keyframes example {
-    0%{
-    display: none;
-    transform: : rotateX(90deg);
-	}
-	50%{
-	    opacity: 0.5;
-	    transform: : rotateX(0deg);
-	}
-	100%{
-	    display: none;
-	    opacity: 0;
-	    transform: rotateX(90deg);
-	}
-}
-.animation{
-/* The element to apply the animation to */
-    width: 100px;
-    height: 100px;
-    background-color: green;
-    animation-name: example;
-    animation-duration: 2s;
-}
-/* Style the tab */
-div.tab {
+ul {
+    list-style-type: none;
+    padding: 0;
     overflow: hidden;
-    border: 1px solid #ccc;
-    background-color: #f1f1f1;
+    background-color: #333;
+    font-size:20px;
 }
 
-/* Style the buttons inside the tab */
-div.tab button {
-    background-color: inherit;
+#text{
     float: left;
-    border: none;
-    outline: none;
-    cursor: pointer;
+    display: block;
+    color: white;
+    text-align: center;
     padding: 14px 16px;
-    transition: 0.3s;
-    font-size: 17px;
+    text-decoration: none;
 }
 
-/* Change background color of buttons on hover */
-div.tab button:hover {
-    background-color: #ddd;
+li a {
+	float:right;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
 }
 
-/* Create an active/current tablink class */
-div.tab button.active {
-    background-color: #ccc;
+li a:hover {
+    background-color: #111;
 }
-
-/* Style the tab content */
-.tabcontent {
-    display: none;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-top: none;

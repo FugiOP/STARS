@@ -41,37 +41,58 @@ public class Courses extends HttpServlet {
     }
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ArrayList<CourseModel> courses = new ArrayList<>();
-		Connection c = null;
-		int instructorID = (int) request.getSession().getAttribute("instructorID");
+		String action = request.getParameter("action")==null?"":request.getParameter("action");
 		
-		try{
-			String url = "jdbc:mysql://localhost/stars";
-			String username = "";
-			String password = "";
-            
-			c = DriverManager.getConnection(url,username,password);
-			Statement stmt = c.createStatement();
-			
-			//Queries for all courses that the user has under his ID
-			ResultSet rs = stmt.executeQuery("select * from class where instructor_id = '"+instructorID+"'");
-			while(rs.next()){
-				courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
+		if(action.equals("")){
+			if(request.getSession().getAttribute("user") != null){
+				ArrayList<CourseModel> courses = new ArrayList<>();
+				
+				int instructorID = request.getSession().getAttribute("instructorID")==null?-1:(int) request.getSession().getAttribute("instructorID");
+		
+				if(instructorID != -1){
+					Connection c = null;
+					try{
+						String url = "jdbc:mysql://localhost/stars";
+						String username = "";
+						String password = "";
+			            
+						c = DriverManager.getConnection(url,username,password);
+						Statement stmt = c.createStatement();
+						
+						//Queries for all courses that the user has under his ID
+						ResultSet rs = stmt.executeQuery("select * from class where instructor_id = '"+instructorID+"'");
+						while(rs.next()){
+							courses.add(new CourseModel(rs.getString("course_name"), rs.getTime("deadline").getHours(),rs.getTime("deadline").getMinutes()));
+						}
+						
+					 }catch( SQLException e ){
+						 throw new ServletException( e );
+				     }
+				     finally{
+			            try{
+			                if( c != null ) c.close();
+			            }
+			            catch( SQLException e ){
+			                throw new ServletException( e );
+			            }
+				     }
+					request.getSession().setAttribute("courses", courses);
+				}
+				request.getRequestDispatcher( "/WEB-INF/Courses.jsp" ).forward(request, response );
+			}else if(request.getSession().getAttribute("user")==null){
+				response.sendRedirect("Login");
+				response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+		        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+		        response.setDateHeader("Expires", 0);
 			}
-			
-		 }catch( SQLException e ){
-			 throw new ServletException( e );
-	     }
-	     finally{
-            try{
-                if( c != null ) c.close();
-            }
-            catch( SQLException e ){
-                throw new ServletException( e );
-            }
-	     }
-		request.getSession().setAttribute("courses", courses);
-		request.getRequestDispatcher( "/WEB-INF/Courses.jsp" ).forward(request, response );
+		}
+		if(action.equals("logout")){
+			response.sendRedirect("Login");
+			response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1.
+	        response.setHeader("Pragma", "no-cache"); // HTTP 1.0.
+	        response.setDateHeader("Expires", 0);
+	        request.getSession().invalidate();
+		}
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -80,12 +101,14 @@ public class Courses extends HttpServlet {
 		
 		int instructorID = (int) request.getSession().getAttribute("instructorID");
 		String action = request.getParameter("action");
+		
 		if(action.equals("logout")){
 			logout(request,response,instructorID);
 			response.sendRedirect("Login");
 		}
 		if(action.equals("viewAttendance")){
-			response.sendRedirect("View");
+			request.getRequestDispatcher( "/WEB-INF/View.jsp" ).forward(request, response );
+
 		}
 		if(action.equals("export")){
 			export(request,response,currentCourse,instructorID);
@@ -183,7 +206,6 @@ public class Courses extends HttpServlet {
 	            // set to binary type if MIME mapping not found
 	            mimeType = "application/octet-stream";
 	        }
-	        System.out.println("MIME type: " + mimeType);
 	         
 	        // modifies response
 	        response.setContentType(mimeType);
@@ -207,7 +229,7 @@ public class Courses extends HttpServlet {
 	        inStream.close();
 	        outStream.close();    
 		}catch(IOException e){
-			System.out.println("File not found");
+
 		}
 	}
 }
